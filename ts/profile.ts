@@ -10,10 +10,10 @@ namespace profile {
     namespace calltable {
         const scoreColumns: analysis.AnalysisColumn[] = [
             {type: "excl", column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true},
-            {type: "excl", column: "term-count", name: "Term Count", description: "Number of symbolic terms created", score: true},
-            {type: "excl", column: "unused-terms", name: "Unused Terms", description: "Number of symbolic terms created that were never used for solving", score: true},
-            {type: "excl", column: "union-size", name: "Union Size", description: "Total number of branches in all symbolic unions created", score: true},
-            {type: "excl", column: "merge-cases", name: "Merge Cases", description: "Number of branches used during merging", score: true},
+	    {type: "excl", column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true},
+            {type: "excl", column: "paths", name: "Paths", description: "Number of paths", score: true},
+            {type: "excl", column: "merge-count", name: "Merges", description: "Number of merges", score: true},
+            {type: "excl", column: "abort-count", name: "Aborts", description: "Number of aborts", score: true},
         ];
 
         const DOM_ROW_KEY = "symproRowObject";

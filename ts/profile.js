@@ -4,10 +4,10 @@ var profile;
     (function (calltable) {
         var scoreColumns = [
             { type: "excl", column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true },
-            { type: "excl", column: "term-count", name: "Term Count", description: "Number of symbolic terms created", score: true },
-            { type: "excl", column: "unused-terms", name: "Unused Terms", description: "Number of symbolic terms created that were never used for solving", score: true },
-            { type: "excl", column: "union-size", name: "Union Size", description: "Total number of branches in all symbolic unions created", score: true },
-            { type: "excl", column: "merge-cases", name: "Merge Cases", description: "Number of branches used during merging", score: true },
+            { type: "excl", column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true },
+            { type: "excl", column: "paths", name: "Paths", description: "Number of paths", score: true },
+            { type: "excl", column: "merge-count", name: "Merges", description: "Number of merges", score: true },
+            { type: "excl", column: "abort-count", name: "Aborts", description: "Number of aborts", score: true },
         ];
         var DOM_ROW_KEY = "symproRowObject";
         var PRUNE_SCORE_FACTOR = 0.01; // < 1% of max score = pruned
@@ -227,7 +227,7 @@ var profile;
                     continue;
                 }
                 // render the function name
-                var nameCell = makeCell(r.function, row);
+                var nameCell = makeCell(r["function"], row);
                 nameCell.className = "name";
                 if (useCallsites && !aggregate) {
                     renderPrettySource(r.node.callsite, nameCell, true);
@@ -254,7 +254,7 @@ var profile;
                     var contextList = document.createElement("ul");
                     contextList.className = "context-list";
                     var n = contextDepth, curr = r.node;
-                    if (n == -1) { // if "infinite", collapse recursion
+                    if (n == -1) {
                         var count = 0;
                         while (curr = curr.parent) {
                             if (curr.parent && curr.parent.name == curr.name && curr.parent.source == curr.source) {
