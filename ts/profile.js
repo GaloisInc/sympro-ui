@@ -5,6 +5,7 @@ var profile;
         var scoreColumns = [
             { type: "excl", column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true },
             { type: "excl", column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true },
+            { type: "excl", column: "non-linear-count", name: "Non-Linear Ops", description: "Number of non-linear operations performed", score: true },
             { type: "excl", column: "paths", name: "Paths", description: "Number of paths", score: true },
             { type: "excl", column: "merge-count", name: "Merges", description: "Number of merges", score: true },
             { type: "excl", column: "abort-count", name: "Aborts", description: "Number of aborts", score: true },
