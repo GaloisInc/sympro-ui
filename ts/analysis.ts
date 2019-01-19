@@ -22,8 +22,20 @@ namespace analysis {
         columns: number[];
     }
 
+    export const enum ColumnType {
+        // Inclusive: Measure a change in some metric, including by
+        // called functions.
+        INCL = "incl",
+        // Exclusive: Measure a change in some metric, excluding
+        // called functions.
+        EXCL = "excl",
+        // Maximum: Measure the highest value of a metric across all
+        // calls to each function.
+        MAX = "max",
+    }
+
     export interface AnalysisColumn {
-        type: string;
+        type: ColumnType;
         column: string;
         name: string;
         score: boolean;
@@ -247,19 +259,23 @@ namespace analysis {
                     let first = rows[0]!;
                     // compute the row's data as the total within
                     let maxScore = 0.0;
-                    let totalValues: Map<number> = {};
+                    let aggValues: Map<number> = {};
                     for (let n of rows) {
                         for (let c of options.columns) {
                             if (n.hasOwnProperty(c.type)) {
                                 let k = c.type + ":" + c.column;
-                                totalValues[k] = (totalValues[k] || 0) + (n[c.type][c.column] || 0);
+                                if (c.type === ColumnType.MAX) {
+                                    aggValues[k] = Math.max(aggValues[k] || 0, n[c.type][c.column] || 0);
+                                } else {
+                                    aggValues[k] = (aggValues[k] || 0) + (n[c.type][c.column] || 0);
+                                }
                             }
                         }
                         maxScore = Math.max(maxScore, n.score);
                     }
                     let columns = [];
                     for (let k of options.columns) {
-                        columns.push(totalValues[k.type + ":" + k.column]);
+                        columns.push(aggValues[k.type + ":" + k.column]);
                     }
                     let row: AnalysisRow = {
                         function: first.name,

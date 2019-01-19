@@ -3,12 +3,14 @@ var profile;
     var calltable;
     (function (calltable) {
         var scoreColumns = [
-            { type: "excl", column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true },
-            { type: "excl", column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true },
-            { type: "excl", column: "non-linear-count", name: "Non-Linear Ops", description: "Number of non-linear operations performed", score: true },
-            { type: "excl", column: "paths", name: "Paths", description: "Number of paths", score: true },
-            { type: "excl", column: "merge-count", name: "Merges", description: "Number of merges", score: true },
-            { type: "excl", column: "abort-count", name: "Aborts", description: "Number of aborts", score: true },
+            { type: "excl" /* EXCL */, column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true },
+            { type: "excl" /* EXCL */, column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true },
+            { type: "excl" /* EXCL */, column: "non-linear-count", name: "Non-Linear Ops", description: "Number of non-linear operations performed", score: true },
+            { type: "excl" /* EXCL */, column: "paths", name: "Paths", description: "Number of paths", score: true },
+            { type: "excl" /* EXCL */, column: "merge-count", name: "Merges", description: "Number of merges", score: true },
+            { type: "excl" /* EXCL */, column: "abort-count", name: "Aborts", description: "Number of aborts", score: true },
+            { type: "max" /* MAX */, column: "LLVM.allocs", name: "LLVM Allocs", description: "Number of allocations in LLVM memory history", score: true },
+            { type: "max" /* MAX */, column: "LLVM.writes", name: "LLVM Writes", description: "Number of writes in LLVM memory history", score: true },
         ];
         var DOM_ROW_KEY = "symproRowObject";
         var PRUNE_SCORE_FACTOR = 0.01; // < 1% of max score = pruned

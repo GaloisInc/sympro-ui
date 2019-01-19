@@ -13,6 +13,7 @@ namespace data {
         outputs: Map<any>;
         children: CallNode[];
         parent: CallNode;
+        max: Map<number>;
         incl: Map<number>;
         excl: Map<number>;
         score: number;
@@ -41,9 +42,71 @@ namespace data {
         FINITIZE
     };
 
-    // events are also a type of message, since they have a type field
-    interface Message {
-        type: string
+    export type Message =
+        MetadataMessage | CallgraphMessage | SolverCallsMessage |
+        UnusedTermsMessage | StreamMessage;
+
+    export interface MetadataMessage {
+        type: "metadata";
+    }
+
+    export interface CallgraphMessage {
+        type: "callgraph";
+        events: CallEvent[];
+    }
+
+    export type CallEvent = EnterEvent | ExitEvent;
+
+    export interface EnterEvent {
+        type: "ENTER";
+        id: string;
+        function: string;
+        location: string;
+        inputs: Map<any>;
+        metrics: Map<number>;
+    }
+
+    export interface ExitEvent {
+        type: "EXIT";
+        outputs: Map<any>;
+        metrics: Map<number>;
+    }
+
+    export interface SolverCallsMessage {
+        type: "solver-calls";
+        events: SolverEvent[];
+    }
+
+    export type SolverEvent = SolverStartEvent | SolverFinishEvent;
+
+    export interface SolverStartEvent {
+        type: "start";
+        part: "solver" | "encode" | "finitize";
+        time: number;
+    }
+
+    export interface SolverFinishEvent {
+        type: "finish";
+        time: number;
+        sat: boolean;
+    }
+
+    export interface UnusedTermsMessage {
+        type: "unused-terms";
+        data: number[][];
+    }
+
+    export type StreamMessage = StreamStartMessage | StreamFinishMessage;
+
+    export interface StreamStartMessage {
+        type: "stream";
+        event: "start";
+        url: string;
+    }
+
+    export interface StreamFinishMessage {
+        type: "stream";
+        event: "finish";
     }
 
     // buffer messages until document ready
@@ -83,9 +146,13 @@ namespace data {
 
     function diffMetrics(p1: Map<number>, p2: Map<number>): Map<number> {
         let ret: Map<number> = {};
-        for (let k in p1) {
-            if (p2.hasOwnProperty(k)) {
+        for (let k in p2) {
+            if (p1.hasOwnProperty(k)) {
                 ret[k] = p2[k] - p1[k];
+            }
+            else {
+                // Some metrics don't appear in the very earliest messages
+                ret[k] = p2[k]
             }
         }
         return ret;
@@ -99,6 +166,19 @@ namespace data {
         for (let c of children) {
             for (let k in incl) {
                 ret[k] -= c.incl[k] || 0;
+            }
+        }
+        return ret;
+    }
+
+    function maxMetrics(p1: Map<number>, p2: Map<number>): Map<number> {
+        let ret = {};
+        for (let k in p1) {
+            ret[k] = Math.max(p1[k], p2[k] || 0);
+        }
+        for (let k in p2) {
+            if (!p1.hasOwnProperty(k)) {
+                ret[k] = p2[k];
             }
         }
         return ret;
@@ -142,6 +222,7 @@ namespace data {
                         outputs: {},
                         children: [],
                         parent: currentState.current,
+                        max: {},
                         incl: {},
                         excl: {},
                         score: 0
@@ -165,6 +246,7 @@ namespace data {
                     currentState.current.isFinished = true;
                     currentState.current.incl = diffMetrics(currentState.current.startMetrics, dm);
                     currentState.current.excl = exclMetrics(currentState.current.incl, currentState.current.children);
+                    currentState.current.max = maxMetrics(currentState.current.startMetrics, currentState.current.finishMetrics);
                     currentState.current = currentState.current.parent;
                 }
             }
@@ -179,6 +261,7 @@ namespace data {
                     curr.finishMetrics = fakeFinishMetrics;
                     curr.incl = diffMetrics(curr.startMetrics, fakeFinishMetrics);
                     curr.excl = exclMetrics(curr.incl, curr.children);
+                    curr.max = maxMetrics(curr.startMetrics, curr.finishMetrics);
                 }
                 curr = curr.parent;
             }
@@ -241,7 +324,7 @@ namespace data {
         }
 
         function webSocketMessageCallback(evt: MessageEvent): void {
-            let msgs = JSON.parse(evt.data); // will be a list of messages
+            let msgs = <Message[]> JSON.parse(evt.data); // will be a list of messages
             receiveData(msgs);
         }
 

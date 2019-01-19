@@ -213,14 +213,19 @@ var analysis;
                     var first = rows[0];
                     // compute the row's data as the total within
                     var maxScore = 0.0;
-                    var totalValues = {};
+                    var aggValues = {};
                     for (var _i = 0, rows_3 = rows; _i < rows_3.length; _i++) {
                         var n = rows_3[_i];
                         for (var _a = 0, _b = options.columns; _a < _b.length; _a++) {
                             var c = _b[_a];
                             if (n.hasOwnProperty(c.type)) {
                                 var k_1 = c.type + ":" + c.column;
-                                totalValues[k_1] = (totalValues[k_1] || 0) + (n[c.type][c.column] || 0);
+                                if (c.type === "max" /* MAX */) {
+                                    aggValues[k_1] = Math.max(aggValues[k_1] || 0, n[c.type][c.column] || 0);
+                                }
+                                else {
+                                    aggValues[k_1] = (aggValues[k_1] || 0) + (n[c.type][c.column] || 0);
+                                }
                             }
                         }
                         maxScore = Math.max(maxScore, n.score);
@@ -228,10 +233,10 @@ var analysis;
                     var columns = [];
                     for (var _c = 0, _d = options.columns; _c < _d.length; _c++) {
                         var k_2 = _d[_c];
-                        columns.push(totalValues[k_2.type + ":" + k_2.column]);
+                        columns.push(aggValues[k_2.type + ":" + k_2.column]);
                     }
                     var row = {
-                        function: first.name,
+                        "function": first.name,
                         node: first,
                         allNodes: rows,
                         score: maxScore,
@@ -265,7 +270,7 @@ var analysis;
                     columns.push(values[k.type + ":" + k.column]);
                 }
                 var row = {
-                    function: n.name,
+                    "function": n.name,
                     node: n,
                     allNodes: [n],
                     score: n.score,

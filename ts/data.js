@@ -40,9 +40,13 @@ var data;
     data_1.readyForData = readyForData;
     function diffMetrics(p1, p2) {
         var ret = {};
-        for (var k in p1) {
-            if (p2.hasOwnProperty(k)) {
+        for (var k in p2) {
+            if (p1.hasOwnProperty(k)) {
                 ret[k] = p2[k] - p1[k];
+            }
+            else {
+                // Some metrics don't appear in the very earliest messages
+                ret[k] = p2[k];
             }
         }
         return ret;
@@ -56,6 +60,18 @@ var data;
             var c = children_1[_i];
             for (var k in incl) {
                 ret[k] -= c.incl[k] || 0;
+            }
+        }
+        return ret;
+    }
+    function maxMetrics(p1, p2) {
+        var ret = {};
+        for (var k in p1) {
+            ret[k] = Math.max(p1[k], p2[k] || 0);
+        }
+        for (var k in p2) {
+            if (!p1.hasOwnProperty(k)) {
+                ret[k] = p2[k];
             }
         }
         return ret;
@@ -87,7 +103,7 @@ var data;
                     var dm = diffMetrics(currentState.zeroMetrics, e.metrics);
                     var node = {
                         id: e.id,
-                        name: e.function,
+                        name: e["function"],
                         callsite: e.callsite,
                         source: e.source,
                         start: dm.time,
@@ -99,13 +115,14 @@ var data;
                         outputs: {},
                         children: [],
                         parent: currentState.current,
+                        max: {},
                         incl: {},
                         excl: {},
                         score: 0
                     };
                     if (currentState.current)
                         currentState.current.children.push(node);
-                    if (!currentState.root) // might be the first call
+                    if (!currentState.root)
                         currentState.root = node;
                     currentState.current = node;
                     currentState.idToNode[e.id] = node;
@@ -123,6 +140,7 @@ var data;
                     currentState.current.isFinished = true;
                     currentState.current.incl = diffMetrics(currentState.current.startMetrics, dm);
                     currentState.current.excl = exclMetrics(currentState.current.incl, currentState.current.children);
+                    currentState.current.max = maxMetrics(currentState.current.startMetrics, currentState.current.finishMetrics);
                     currentState.current = currentState.current.parent;
                 }
             }
@@ -136,6 +154,7 @@ var data;
                     curr.finishMetrics = fakeFinishMetrics;
                     curr.incl = diffMetrics(curr.startMetrics, fakeFinishMetrics);
                     curr.excl = exclMetrics(curr.incl, curr.children);
+                    curr.max = maxMetrics(curr.startMetrics, curr.finishMetrics);
                 }
                 curr = curr.parent;
             }

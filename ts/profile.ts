@@ -8,13 +8,17 @@ namespace profile {
     import ProfileState = data.ProfileState;
 
     namespace calltable {
+        import CT = analysis.ColumnType;
+
         const scoreColumns: analysis.AnalysisColumn[] = [
-            {type: "excl", column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true},
-	    {type: "excl", column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true},
-	    {type: "excl", column: "non-linear-count", name: "Non-Linear Ops", description: "Number of non-linear operations performed", score: true},
-            {type: "excl", column: "paths", name: "Paths", description: "Number of paths", score: true},
-            {type: "excl", column: "merge-count", name: "Merges", description: "Number of merges", score: true},
-            {type: "excl", column: "abort-count", name: "Aborts", description: "Number of aborts", score: true},
+            {type: CT.EXCL, column: "time", name: "Time (ms)", description: "Total time spent in this function (but not in descendent calls)", score: true},
+            {type: CT.EXCL, column: "allocs", name: "Allocs", description: "Number of symbolic AST nodes allocated", score: true},
+            {type: CT.EXCL, column: "non-linear-count", name: "Non-Linear Ops", description: "Number of non-linear operations performed", score: true},
+            {type: CT.EXCL, column: "paths", name: "Paths", description: "Number of paths", score: true},
+            {type: CT.EXCL, column: "merge-count", name: "Merges", description: "Number of merges", score: true},
+            {type: CT.EXCL, column: "abort-count", name: "Aborts", description: "Number of aborts", score: true},
+            {type: CT.MAX, column: "LLVM.allocs", name: "LLVM Allocs", description: "Number of allocations in LLVM memory history", score: true},
+            {type: CT.MAX, column: "LLVM.writes", name: "LLVM Writes", description: "Number of writes in LLVM memory history", score: true},
         ];
 
         const DOM_ROW_KEY = "symproRowObject";
