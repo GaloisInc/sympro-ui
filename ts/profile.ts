@@ -382,6 +382,9 @@ namespace profile {
                 } else if (call.type == data.SolverCallType.FINITIZE) {
                     summary = `Solver finitization: ${dt}ms`;
                 }
+                if (typeof call.description !== "undefined") {
+                    summary = `${summary}\n${call.description}`
+                }
                 ret.push({
                     start: call.start,
                     finish: finish,

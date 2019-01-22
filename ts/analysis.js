@@ -236,7 +236,7 @@ var analysis;
                         columns.push(aggValues[k_2.type + ":" + k_2.column]);
                     }
                     var row = {
-                        "function": first.name,
+                        function: first.name,
                         node: first,
                         allNodes: rows,
                         score: maxScore,
@@ -270,7 +270,7 @@ var analysis;
                     columns.push(values[k.type + ":" + k.column]);
                 }
                 var row = {
-                    "function": n.name,
+                    function: n.name,
                     node: n,
                     allNodes: [n],
                     score: n.score,

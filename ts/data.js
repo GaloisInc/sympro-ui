@@ -103,7 +103,7 @@ var data;
                     var dm = diffMetrics(currentState.zeroMetrics, e.metrics);
                     var node = {
                         id: e.id,
-                        name: e["function"],
+                        name: e.function,
                         callsite: e.callsite,
                         source: e.source,
                         start: dm.time,
@@ -175,7 +175,8 @@ var data;
                         type: typ,
                         start: e.time - startTime,
                         finish: undefined,
-                        sat: undefined
+                        sat: undefined,
+                        description: e.description,
                     });
                 }
                 else if (e.type == "finish") {

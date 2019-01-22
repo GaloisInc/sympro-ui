@@ -34,6 +34,7 @@ namespace data {
         start: number;
         finish: number;
         sat: boolean;
+        description?: string;
     }
 
     export enum SolverCallType {
@@ -83,6 +84,7 @@ namespace data {
         type: "start";
         part: "solver" | "encode" | "finitize";
         time: number;
+        description?: string;
     }
 
     export interface SolverFinishEvent {
@@ -281,7 +283,8 @@ namespace data {
                         type: typ,
                         start: e.time - startTime,
                         finish: undefined,
-                        sat: undefined
+                        sat: undefined,
+                        description: e.description,
                     });
                 } else if (e.type == "finish") {
                     if (currentState.solverCalls.length > 0) {

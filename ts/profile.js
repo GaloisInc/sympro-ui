@@ -230,7 +230,7 @@ var profile;
                     continue;
                 }
                 // render the function name
-                var nameCell = makeCell(r["function"], row);
+                var nameCell = makeCell(r.function, row);
                 nameCell.className = "name";
                 if (useCallsites && !aggregate) {
                     renderPrettySource(r.node.callsite, nameCell, true);
@@ -361,6 +361,9 @@ var profile;
                 }
                 else if (call.type == data.SolverCallType.FINITIZE) {
                     summary = "Solver finitization: " + dt + "ms";
+                }
+                if (typeof call.description !== "undefined") {
+                    summary = summary + "\n" + call.description;
                 }
                 ret.push({
                     start: call.start,
